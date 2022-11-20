@@ -199,7 +199,7 @@ provincia_input.grid(row=6, column=1, padx=10, pady=10)
 legajolabel= Label(framecampos, text="Legajo")
 legajolabel.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
-alumnoslabel= Label(framecampos, text="Alumnos")
+alumnoslabel= Label(framecampos, text="Alumno")
 alumnoslabel.grid(row=1, column=0, padx=10, pady=10 , sticky="w")
 
 emaillabel= Label(framecampos, text="Email")
@@ -245,7 +245,7 @@ boton_actualizar.grid(row=0, column=2,   pady=10 )
 
 #borrar
 boton_borrar = Button(framebotones,text="Borrar", command=limpiar)
-boton_borrar.config(bg="navy",fg="white")
+boton_borrar.config(bg="red",fg="white")
 boton_borrar.grid(row=0, column=3, pady=10 )
 
 
