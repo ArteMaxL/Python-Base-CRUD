@@ -15,7 +15,7 @@ def conectar():
     global cur
     con = sq3.connect("my_db.db") #creara la base de datos
     cur = con.cursor() #Cadete virtual nos traer y lleva los datos de y hacia la db
-    messagebox.showinfo("STATUS","Conectando a la BBDD!")
+    messagebox.showinfo("STATUS","Conectado a la BBDD!")
     
     #SQL para crear la tabla escuela
     instruct1= '''CREATE TABLE IF NOT EXISTS escuelas (
@@ -50,7 +50,7 @@ def conectar():
         #Por ejemplo esta se va a ejecutar 9 veces, una por cada alumno
         cur.executemany("INSERT INTO alumnos VALUES (?,?,?,?,?,?,?)",lista2)
     except:
-        print("Posiblemente estos valores ya existen en la Base de Datos")
+        pass
     
     con.commit()#se encarga de que los cambios en la base de datos se guarden
 
@@ -62,7 +62,7 @@ lista2=[(1,2,1000,'Ramón Mesa',8,1,'rmesa@mail.com'),(2,2,1002,'Tomás Smith',8
 
 #Salir
 def salir():
-    respuesta= messagebox.askquestion("CONFIRMACION","Esta seguro que quiere salir?")
+    respuesta= messagebox.askquestion("CONFIRMACION","Está seguro que quiere salir?")
     if respuesta == "yes":
         try:#intenta lo siguiente
             con.close()
@@ -104,7 +104,11 @@ def leer():
         ON alumnos.id_escuela = escuelas._id 
         WHERE alumnos.legajo=
         '''
-    cur.execute(query+legajo.get())
+    try:
+        cur.execute(query+legajo.get())
+    except:
+        pass
+
     resultado=cur.fetchall()
     if resultado == []:
         messagebox.showerror("ERROR", "Número de legajo inexistente")
@@ -120,7 +124,6 @@ def leer():
 
 # Crear
 def crear():
-
     pass
 
 # Actualizar
@@ -166,7 +169,6 @@ def localizar_escuela(event):
     provincia.set(resultado[0][1])
 
     con.close()
-    return escuelas
 
 '''
 ========================
@@ -237,7 +239,7 @@ calificacion_input.grid(row=3, column=1, padx=10, pady=10)
 
 # escuela_input= Entry(framecampos, textvariable=escuela)
 schools = buscar_escuelas()
-escuela.set('Seleccione')
+escuela.set('Seleccione...')
 escuela_input = OptionMenu(framecampos, escuela, *schools, command = localizar_escuela)
 escuela_input.grid(row=4, column=1, padx=10, pady=10)
 
