@@ -76,7 +76,7 @@ def limpiar():
     alumnos.set("")
     email.set("")
     calificacion.set("0.0")
-    escuela.set("")
+    escuela.set("Seleccione...")
     localidad.set("")
     provincia.set("")
     legajo_input.config(state="normal")
@@ -122,9 +122,18 @@ def leer():
         provincia.set(resultado[0][6])
         legajo_input.config(state="disabled")
 
-# Crear
+# Crear Legajo
 def crear():
-    pass
+    id_escuela = buscar_escuelas(True)
+    id_escuela = int(id_escuela[0])
+    datos = id_escuela, legajo.get(), alumnos.get(), calificacion.get(), email.get() #escuela.get(), localidad.get(), provincia.get()    
+
+    cur.execute('INSERT INTO alumnos(id_escuela, legajo, nombre, nota, email) VALUES(?,?,?,?,?)', datos)
+    con.commit()
+
+    messagebox.showinfo('STATUS', 'Registro exitoso')
+
+    limpiar()
 
 # Actualizar
 def actualizar():
@@ -146,15 +155,25 @@ def listado_alumnos():
     messagebox.showinfo('ALUMNOS', texto)
 
 # Funciones Auxiliares
-def buscar_escuelas():
+def buscar_escuelas(boolean):
     con = sq3.connect('my_db.db')
     cur = con.cursor()
-    cur.execute('SELECT nombre FROM escuelas')
+
+    if boolean:
+        cur.execute('SELECT _id, localidad, provincia FROM escuelas WHERE nombre = ?',(escuela.get(),))
+    else:
+        cur.execute('SELECT nombre FROM escuelas')
+
     resultado = cur.fetchall()
 
     escuelas = []
-    for escuela in resultado:
-        escuelas.append(escuela[0])
+    for escuela_elm in resultado:
+        if boolean:
+            id_escuela = escuela_elm[0]
+            localidad.set(escuela_elm[1])
+            provincia.set(escuela_elm[2])
+        
+        escuelas.append(escuela_elm[0])
 
     con.close()
     return escuelas
@@ -238,7 +257,7 @@ calificacion_input.grid(row=3, column=1, padx=10, pady=10)
 # Manejo MENU desplegable escuela
 
 # escuela_input= Entry(framecampos, textvariable=escuela)
-schools = buscar_escuelas()
+schools = buscar_escuelas(False)
 escuela.set('Seleccione...')
 escuela_input = OptionMenu(framecampos, escuela, *schools, command = localizar_escuela)
 escuela_input.grid(row=4, column=1, padx=10, pady=10)
