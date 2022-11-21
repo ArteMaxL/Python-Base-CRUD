@@ -2,6 +2,7 @@ from tkinter import *
 import sqlite3 as sq3 #Va a necesitar traer esta libreria a nuestro programa
 #from asyncio.windows_events import NULL # Nos permite trabajar con la BBDD y registros NULL
 from tkinter import messagebox
+
 '''
 ========================
         FUNCIONAL
@@ -12,7 +13,7 @@ from tkinter import messagebox
 def conectar():
     global con
     global cur
-    con = sq3.connect("mi_db.db") #creara la base de datos
+    con = sq3.connect("my_db.db") #creara la base de datos
     cur = con.cursor() #Cadete virtual nos traer y lleva los datos de y hacia la db
     messagebox.showinfo("STATUS","Conectando a la BBDD!")
     
@@ -106,7 +107,7 @@ def leer():
     cur.execute(query+legajo.get())
     resultado=cur.fetchall()
     if resultado == []:
-        messagebox.showerror("ERROR", "Este legajo no existe")
+        messagebox.showerror("ERROR", "Número de legajo inexistente")
     else:
         legajo.set(resultado[0][0])
         alumnos.set(resultado[0][1])
@@ -116,8 +117,56 @@ def leer():
         localidad.set(resultado[0][5])
         provincia.set(resultado[0][6])
         legajo_input.config(state="disabled")
-    
 
+# Crear
+def crear():
+
+    pass
+
+# Actualizar
+def actualizar():
+    pass
+
+# Listado de Alumnos
+def listado_alumnos():
+    query='''SELECT alumnos.legajo, alumnos.nombre, escuelas.nombre, escuelas.provincia
+        FROM alumnos INNER JOIN escuelas 
+        ON alumnos.id_escuela = escuelas._id
+        '''
+    cur.execute(query)
+    resultado = cur.fetchall()
+    texto = ''
+    for alumno in resultado:
+        texto += str(alumno)
+        texto += '\n'
+    
+    messagebox.showinfo('ALUMNOS', texto)
+
+# Funciones Auxiliares
+def buscar_escuelas():
+    con = sq3.connect('my_db.db')
+    cur = con.cursor()
+    cur.execute('SELECT nombre FROM escuelas')
+    resultado = cur.fetchall()
+
+    escuelas = []
+    for escuela in resultado:
+        escuelas.append(escuela[0])
+
+    con.close()
+    return escuelas
+
+def localizar_escuela(event):
+    con = sq3.connect('my_db.db')
+    cur = con.cursor()
+    cur.execute('SELECT localidad, provincia FROM escuelas WHERE nombre = ?', (escuela.get(),))
+    resultado = cur.fetchall()
+
+    localidad.set(resultado[0][0])
+    provincia.set(resultado[0][1])
+
+    con.close()
+    return escuelas
 
 '''
 ========================
@@ -133,7 +182,7 @@ raiz.config(menu = barramenu)#Con este renglon asignamos a el objeto raiz el obj
 #Menú BBDD
 bbddmenu = Menu (barramenu , tearoff = 0) # Lo ubicar en barramenu
 bbddmenu.add_command(label="Conectar", command=conectar) #agrega otra opcion al objeto barramenu
-bbddmenu.add_command(label="Listado de alumnos")
+bbddmenu.add_command(label="Listado de alumnos", command=listado_alumnos)
 bbddmenu.add_command(label="Salir", command=salir)
 barramenu.add_cascade(label="BBDD", menu= bbddmenu)
 
@@ -150,6 +199,7 @@ barramenu.add_cascade(label="Acerca de", menu=acercamenu)
 
 #FrameCampos
 framecampos = Frame(raiz)
+framecampos.config(background='CadetBlue')
 framecampos.pack() #si no le pasas argumentos, lo que hace pack es "a groso modo" ubica este objeto debajo del objeto anterior
 
 #Creamos las variables para guardar los datos de los entrys
@@ -183,8 +233,15 @@ email_input.grid(row=2, column=1, padx=10, pady=10)
 calificacion_input= Entry(framecampos, textvariable=calificacion)
 calificacion_input.grid(row=3, column=1, padx=10, pady=10)
 
-escuela_input= Entry(framecampos, textvariable=escuela)
+# Manejo MENU desplegable escuela
+
+# escuela_input= Entry(framecampos, textvariable=escuela)
+schools = buscar_escuelas()
+escuela.set('Seleccione')
+escuela_input = OptionMenu(framecampos, escuela, *schools, command = localizar_escuela)
 escuela_input.grid(row=4, column=1, padx=10, pady=10)
+
+#------------------------------------------------
 
 localidad_input= Entry(framecampos, textvariable=localidad)
 localidad_input.grid(row=5, column=1, padx=10, pady=10)
@@ -193,10 +250,10 @@ provincia_input= Entry(framecampos, textvariable=provincia)
 provincia_input.grid(row=6, column=1, padx=10, pady=10)
 
 #seccion Labels
-legajolabel= Label(framecampos, text="Legajo")
+legajolabel= Label(framecampos, text="Legajo", background='CadetBlue')
 legajolabel.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
-alumnoslabel= Label(framecampos, text="Alumno")
+alumnoslabel= Label(framecampos, text="Alumno", background='CadetBlue')
 alumnoslabel.grid(row=1, column=0, padx=10, pady=10 , sticky="w")
 
 emaillabel= Label(framecampos, text="Email", background='CadetBlue')
@@ -205,13 +262,13 @@ emaillabel.grid(row=2, column=0, padx=10, pady=10 , sticky="w")
 calificacionlabel= Label(framecampos, text="Calificación", background='CadetBlue')
 calificacionlabel.grid(row=3, column=0, padx=10, pady=10 , sticky="w")
 
-escuelalabel= Label(framecampos, text="Escuela")
+escuelalabel= Label(framecampos, text="Escuela", background='CadetBlue')
 escuelalabel.grid(row=4, column=0, padx=10, pady=10 , sticky="w")
 
-localidadlabel= Label(framecampos, text="Localidad")
+localidadlabel= Label(framecampos, text="Localidad", background='CadetBlue')
 localidadlabel.grid(row=5, column=0, padx=10, pady=10 , sticky="w")
 
-provincialabel= Label(framecampos, text="Provincia")
+provincialabel= Label(framecampos, text="Provincia", background='CadetBlue')
 provincialabel.grid(row=6, column=0, padx=10, pady=10, sticky="w")
 
 
@@ -229,7 +286,7 @@ framebotones = Frame(raiz)
 framebotones.pack()
 
 #Crear
-boton_crear = Button(framebotones,text="Crear")
+boton_crear = Button(framebotones,text="Crear", command=crear)
 boton_crear.grid(row=0, column=0, pady=10 )
 
 #leer
@@ -237,7 +294,7 @@ boton_leer = Button(framebotones,text="Leer",command=leer)
 boton_leer.grid(row=0, column=1,  pady=10 )
 
 #actualizar
-boton_actualizar = Button(framebotones,text="Actualizar")
+boton_actualizar = Button(framebotones,text="Actualizar", command=actualizar)
 boton_actualizar.grid(row=0, column=2,   pady=10 )
 
 #borrar
@@ -250,7 +307,8 @@ boton_borrar.grid(row=0, column=3, pady=10 )
 framecopy = Frame(raiz)
 framecopy.pack()
 
-copylabel= Label(framecopy, text="2022 copyright Marcia")
+copylabel= Label(framecopy, text="Copyright 2022 - Marcia")
+copylabel.config(background='LightYellow')
 copylabel.grid(row=0, column=0)
 
 raiz.mainloop() #No cierre la ventana cuando termine el programa, que la cierre el usuario
