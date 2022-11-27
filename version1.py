@@ -1,6 +1,7 @@
 from tkinter import *
 import sqlite3 as sq3
-#from asyncio.windows_events import NULL # Nos permite trabajar con la BBDD y registros NULL
+#Nos permite trabajar con la BBDD y registros NULL SOLO WINDOWS
+#from asyncio.windows_events import NULL
 from tkinter import messagebox
 
 '''
